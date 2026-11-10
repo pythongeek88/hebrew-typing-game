@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hebrew typing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <button id="theme-switch" class="theme-switch" type="button" aria-label="Theme">
+    <span data-theme-option="dark">Dark</span>
+    <span data-theme-option="light">Light</span>
+  </button>
+  <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true">Sound on</button>
+
+  <section id="screen-setup" class="screen">
+    <div class="panel">
+      <textarea id="passage" dir="rtl" spellcheck="false"></textarea>
+      <p id="empty-note" class="empty-note" hidden></p>
+      <button id="use-sample" class="quiet" type="button">Use sample</button>
+      <button id="start" class="start-button" type="button"></button>
+    </div>
+  </section>
+
+  <section id="screen-play" class="screen screen-play" hidden tabindex="-1">
+    <div class="stage">
+      <div id="passage-strip" class="passage-strip" dir="rtl"></div>
+      <p id="script-tag" class="script-tag" dir="ltr"></p>
+      <div id="stage-word" class="stage-word"></div>
+      <div id="space-step" class="space-step" hidden>
+        <div class="spacebar">space</div>
+      </div>
+      <div class="stats">
+        <span id="stat-cpm"></span>
+        <span id="stat-accuracy"></span>
+      </div>
+      <button id="restart-play" class="quiet" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section id="screen-finish" class="screen" hidden>
+    <div class="panel">
+      <p id="finish-line"></p>
+      <div id="finish-stats"></div>
+      <div class="quiet-actions">
+        <button id="restart-finish" class="quiet" type="button">Restart</button>
+        <button id="edit-text" class="quiet" type="button">Edit text</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/copy.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

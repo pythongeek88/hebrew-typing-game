@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hebrew typing — markup sketch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .sketch-caption {
+      position: absolute;
+      z-index: 6;
+      top: 1.4rem;
+      left: 50%;
+      margin: 0;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      line-height: 1;
+      text-transform: uppercase;
+      direction: ltr;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .theme-example {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-switch" class="theme-switch" type="button">
+    <span data-theme-option="dark">Dark</span>
+    <span data-theme-option="light">Light</span>
+  </button>
+  <button id="sound-toggle" class="sound-toggle" type="button">Sound on</button>
+
+  <section id="screen-setup" class="screen">
+    <p class="sketch-caption" dir="ltr">setup</p>
+    <div class="panel">
+      <textarea id="passage" dir="rtl" spellcheck="false" placeholder="השארתי את keyboard על השולחן, ויצאתי לקנות לחם. ליד הדלת אמרתי привет לחתול, והוא לא זז. כשחזרתי, התה עדיין היה חם."></textarea>
+      <p id="empty-note" class="empty-note">The empty box is not a passage.</p>
+      <button id="use-sample" class="quiet" type="button">Use sample</button>
+      <button id="start" class="start-button is-shake" type="button">Let's rock</button>
+    </div>
+  </section>
+
+  <section id="screen-play" class="screen screen-play is-combo">
+    <p class="sketch-caption" dir="ltr">play · hebrew</p>
+    <div class="stage">
+      <div id="passage-strip" class="passage-strip" dir="rtl">
+        <span class="strip-word is-done" dir="rtl">השארתי</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="rtl">את</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="ltr">keyboard</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="rtl">על</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-current" dir="rtl">ויצאתי</span>
+        <span class="strip-space"></span>
+        <span class="strip-word" dir="ltr">привет</span>
+      </div>
+      <p id="script-tag" class="script-tag">Hebrew</p>
+      <div id="stage-word" class="stage-word" dir="rtl">
+        <span class="letter is-done">ו</span><span class="letter is-next">י</span><span class="letter is-ahead">צ</span><span class="letter is-ahead">א</span><span class="letter is-ahead">ת</span><span class="letter is-ahead">י</span>
+      </div>
+      <div id="space-step" class="space-step" hidden>
+        <div class="spacebar">space</div>
+      </div>
+      <div class="stats">
+        <span id="stat-cpm">86 characters / min</span>
+        <span id="stat-accuracy">98% accuracy</span>
+      </div>
+      <button id="restart-play" class="quiet" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section class="screen screen-play">
+    <p class="sketch-caption" dir="ltr">play · space</p>
+    <div class="stage">
+      <div class="passage-strip" dir="rtl">
+        <span class="strip-word is-done" dir="rtl">השארתי</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="rtl">את</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="ltr">keyboard</span>
+        <span class="strip-space is-next"></span>
+        <span class="strip-word" dir="rtl">על</span>
+        <span class="strip-space"></span>
+        <span class="strip-word" dir="ltr">привет</span>
+      </div>
+      <p class="script-tag" dir="ltr">English</p>
+      <div class="stage-word is-settled" dir="ltr">
+        <span class="letter is-done">k</span><span class="letter is-done">e</span><span class="letter is-done">y</span><span class="letter is-done">b</span><span class="letter is-done">o</span><span class="letter is-done">a</span><span class="letter is-done">r</span><span class="letter is-done">d</span>
+      </div>
+      <div class="space-step">
+        <div class="spacebar">space</div>
+      </div>
+      <div class="stats">
+        <span>86 characters / min</span>
+        <span>98% accuracy</span>
+      </div>
+      <button class="quiet" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section class="screen screen-play is-error">
+    <p class="sketch-caption" dir="ltr">play · english</p>
+    <div class="stage">
+      <div class="passage-strip" dir="rtl">
+        <span class="strip-word is-done" dir="rtl">השארתי</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-done" dir="rtl">את</span>
+        <span class="strip-space"></span>
+        <span class="strip-word is-current" dir="ltr">keyboard</span>
+        <span class="strip-space"></span>
+        <span class="strip-word" dir="rtl">על</span>
+        <span class="strip-space"></span>
+        <span class="strip-word" dir="ltr">привет</span>
+      </div>
+      <p class="script-tag" dir="ltr">English</p>
+      <div class="stage-word" dir="ltr">
+        <span class="letter is-done">k</span><span class="letter is-next">e</span><span class="letter is-ahead">y</span><span class="letter is-ahead">b</span><span class="letter is-ahead">o</span><span class="letter is-ahead">a</span><span class="letter is-ahead">r</span><span class="letter is-ahead">d</span>
+      </div>
+      <div class="space-step" hidden>
+        <div class="spacebar">space</div>
+      </div>
+      <div class="stats">
+        <span>102 characters / min</span>
+        <span>96% accuracy</span>
+      </div>
+      <button class="quiet" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section id="screen-finish" class="screen is-burst">
+    <p class="sketch-caption" dir="ltr">finish</p>
+    <div class="panel">
+      <p id="finish-line">That was a complete run, whatever the numbers say.</p>
+      <div id="finish-stats">
+        <span>94<small>characters / min</small></span>
+        <span>99%<small>accuracy</small></span>
+      </div>
+      <div class="quiet-actions">
+        <button id="restart-finish" class="quiet" type="button">Restart</button>
+        <button id="edit-text" class="quiet" type="button">Edit text</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="theme-example" data-theme="light">
+    <button class="theme-switch" type="button">
+      <span data-theme-option="dark">Dark</span>
+      <span data-theme-option="light">Light</span>
+    </button>
+    <button class="sound-toggle" type="button">Sound on</button>
+
+    <section class="screen">
+      <p class="sketch-caption" dir="ltr">light · setup</p>
+      <div class="panel">
+        <textarea class="passage" dir="rtl" spellcheck="false" placeholder="השארתי את keyboard על השולחן, ויצאתי לקנות לחם. ליד הדלת אמרתי привет לחתול, והוא לא זז. כשחזרתי, התה עדיין היה חם.">השארתי את keyboard על השולחן, ויצאתי לקנות לחם. ליד הדלת אמרתי привет לחתול, והוא לא זז. כשחזרתי, התה עדיין היה חם.</textarea>
+        <p class="empty-note" hidden>The empty box is not a passage.</p>
+        <button class="quiet" type="button">Use sample</button>
+        <button class="start-button" type="button">Let's rock</button>
+      </div>
+    </section>
+
+    <section class="screen screen-play">
+      <p class="sketch-caption" dir="ltr">light · play</p>
+      <div class="stage">
+        <div class="passage-strip" dir="rtl">
+          <span class="strip-word is-done" dir="rtl">השארתי</span>
+          <span class="strip-space"></span>
+          <span class="strip-word is-done" dir="ltr">keyboard</span>
+          <span class="strip-space is-next"></span>
+          <span class="strip-word is-current" dir="rtl">לחם</span>
+          <span class="strip-space"></span>
+          <span class="strip-word" dir="ltr">привет</span>
+        </div>
+        <p class="script-tag">Hebrew</p>
+        <div class="stage-word" dir="rtl">
+          <span class="letter is-done">ל</span><span class="letter is-next">ח</span><span class="letter is-ahead">ם</span>
+        </div>
+        <div class="space-step" hidden>
+          <div class="spacebar">space</div>
+        </div>
+        <div class="stats">
+          <span>74 characters / min</span>
+          <span>100% accuracy</span>
+        </div>
+        <button class="quiet" type="button">Restart</button>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
