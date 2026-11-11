@@ -312,6 +312,7 @@ button {
 #restart-play,
 #restart-finish,
 #edit-text,
+#clear-text,
 .quiet {
   align-self: flex-start;
   border: 1px solid var(--line);
@@ -784,6 +785,7 @@ button {
   #restart-play:hover,
   #restart-finish:hover,
   #edit-text:hover,
+  #clear-text:hover,
   .quiet:hover {
     color: var(--text);
     border-color: var(--line-strong);

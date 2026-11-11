@@ -48,6 +48,7 @@
     useSample: 'Use sample',
     restart: 'Restart',
     editText: 'Edit text',
+    clearText: 'Clear text',
     soundOn: 'Sound on',
     soundOff: 'Sound off',
     dark: 'Dark',

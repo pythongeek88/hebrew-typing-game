@@ -264,6 +264,7 @@
   document.getElementById('restart-play').textContent = copy.restart;
   document.getElementById('restart-finish').textContent = copy.restart;
   document.getElementById('edit-text').textContent = copy.editText;
+  document.getElementById('clear-text').textContent = copy.clearText;
   soundBtn.textContent = copy.soundOn;
   themeSwitch.querySelector('[data-theme-option="dark"]').textContent = copy.dark;
   themeSwitch.querySelector('[data-theme-option="light"]').textContent = copy.light;
@@ -302,6 +303,17 @@
 
   document.getElementById('edit-text').addEventListener('click', function () {
     stopStats();
+    finish.classList.remove('is-burst');
+    show(setup);
+  });
+
+  document.getElementById('clear-text').addEventListener('click', function () {
+    stopStats();
+    source = '';
+    run = null;
+    passage.value = '';
+    emptyNote.hidden = true;
+    play.classList.remove('is-error', 'is-combo');
     finish.classList.remove('is-burst');
     show(setup);
   });
