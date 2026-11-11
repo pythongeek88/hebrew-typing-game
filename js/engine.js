@@ -5,17 +5,27 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // Strip Hebrew niqqud and cantillation only:
-  // U+0591–U+05BD, U+05BF, U+05C1, U+05C2, U+05C4, U+05C5, U+05C7.
-  // Letters, final letters, maqaf, paseq, geresh, and gershayim stay.
-  function isStrippedMark(cp) {
-    return (cp >= 0x0591 && cp <= 0x05BD) ||
-      cp === 0x05BF ||
-      cp === 0x05C1 ||
-      cp === 0x05C2 ||
-      cp === 0x05C4 ||
-      cp === 0x05C5 ||
-      cp === 0x05C7;
+  // Turn curly quotes and dashes into the matching keyboard punctuation.
+  function foldPunctuation(cp) {
+    if (cp === 0x2018 || cp === 0x2019 || cp === 0x201A || cp === 0x201B) return 0x0027;
+    if (cp === 0x201C || cp === 0x201D || cp === 0x201E || cp === 0x201F) return 0x0022;
+    if (cp === 0x2013 || cp === 0x2014 || cp === 0x2212) return 0x002D;
+    return cp;
+  }
+
+  // English A-Z/a-z, Russian Cyrillic, Hebrew letters, digits, space, and
+  // keyboard punctuation. Capitals stay. Everything else is removed.
+  function isAllowed(cp) {
+    if (cp === 0x0020 || cp === 0x000A || cp === 0x000D) return true;
+    if ((cp >= 0x0041 && cp <= 0x005A) || (cp >= 0x0061 && cp <= 0x007A)) return true;
+    if (cp >= 0x0030 && cp <= 0x0039) return true;
+    if (cp >= 0x05D0 && cp <= 0x05EA) return true;
+    if (cp >= 0x0400 && cp <= 0x04FF) return true;
+    if (cp === 0x05BE || cp === 0x05F3 || cp === 0x05F4) return true;
+    return cp === 0x0021 || cp === 0x0022 || cp === 0x0027 ||
+      cp === 0x0028 || cp === 0x0029 || cp === 0x002C ||
+      cp === 0x002D || cp === 0x002E || cp === 0x002F ||
+      cp === 0x003A || cp === 0x003B || cp === 0x003F;
   }
 
   // Unicode White_Space, plus U+FEFF which JavaScript trim treats as space.
@@ -41,6 +51,20 @@
     return null;
   }
 
+  function cleanText(value) {
+    if (typeof value !== 'string' || value.length === 0) return '';
+    var text = value.normalize('NFC');
+    var out = '';
+    var i = 0;
+    while (i < text.length) {
+      var cp = foldPunctuation(text.codePointAt(i));
+      var ch = String.fromCodePoint(cp);
+      i += String.fromCodePoint(text.codePointAt(i)).length;
+      if (isAllowed(cp)) out += ch;
+    }
+    return out;
+  }
+
   function scalarValues(text) {
     var units = [];
     var i = 0;
@@ -48,7 +72,7 @@
       var cp = text.codePointAt(i);
       var ch = String.fromCodePoint(cp);
       i += ch.length;
-      if (!isStrippedMark(cp)) units.push({ cp: cp, ch: ch });
+      units.push({ cp: cp, ch: ch });
     }
     return units;
   }
@@ -100,7 +124,7 @@
   function buildTokens(rawText) {
     if (typeof rawText !== 'string' || rawText.length === 0) return [];
 
-    var units = scalarValues(rawText.normalize('NFC'));
+    var units = scalarValues(cleanText(rawText));
     var start = 0;
     var end = units.length;
     while (start < end && isWhitespace(units[start].cp)) start += 1;
@@ -132,9 +156,10 @@
   }
 
   function createRun(rawText) {
-    var tokens = buildTokens(rawText);
+    var cleaned = cleanText(rawText);
+    var tokens = buildTokens(cleaned);
     return {
-      rawText: rawText,
+      rawText: cleaned,
       tokens: tokens,
       tokenIndex: 0,
       charIndex: 0,
@@ -241,5 +266,5 @@
     return createRun(run.rawText);
   }
 
-  return { createRun: createRun, press: press, stats: stats, restart: restart };
+  return { createRun: createRun, press: press, stats: stats, restart: restart, cleanText: cleanText };
 });

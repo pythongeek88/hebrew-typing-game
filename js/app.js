@@ -231,8 +231,9 @@
   }
 
   function begin(text) {
-    source = text;
-    run = engine.createRun(text);
+    source = engine.cleanText(text);
+    if (passage.value !== source) passage.value = source;
+    run = engine.createRun(source);
     if (run.status === 'empty') {
       emptyNote.hidden = false;
       emptyNote.textContent = copy.empty;
@@ -279,6 +280,12 @@
   });
 
   passage.addEventListener('input', function () {
+    var cleaned = engine.cleanText(passage.value);
+    if (cleaned !== passage.value) {
+      var cursor = engine.cleanText(passage.value.slice(0, passage.selectionStart)).length;
+      passage.value = cleaned;
+      passage.setSelectionRange(cursor, cursor);
+    }
     if (passage.value.trim()) emptyNote.hidden = true;
   });
 
