@@ -24,6 +24,9 @@
   var finishStats = document.getElementById('finish-stats');
   var soundBtn = document.getElementById('sound-toggle');
   var themeSwitch = document.getElementById('theme-switch');
+  var progress = document.getElementById('progress');
+  var progressValue = document.getElementById('progress-value');
+  var catcher = document.getElementById('key-catcher');
 
   var run = null;
   var source = '';
@@ -31,6 +34,11 @@
   var audioCtx = null;
   var statTimer = 0;
   var errorTimer = 0;
+  var milestoneTimer = 0;
+  var finishTimer = 0;
+  var celebratedMark = 0;
+  var lastSample = -1;
+  var sawBeforeInput = false;
 
   function pick(list) {
     return list[Math.floor(Math.random() * list.length)];
@@ -64,7 +72,7 @@
       startBtn.textContent = pick(copy.startLabels);
       passage.focus();
     }
-    if (screen === play) play.focus();
+    if (screen === play) catcher.focus();
   }
 
   function scriptLabel(ch) {
@@ -172,11 +180,57 @@
     statTimer = window.setInterval(paintStats, 200);
   }
 
+  function passagePercent() {
+    if (!run || !run.tokens.length) return 0;
+    if (run.status === 'finished') return 100;
+    var total = 0;
+    var done = 0;
+    run.tokens.forEach(function (token, index) {
+      var size = token.type === 'space' ? 1 : token.chars.length;
+      total += size;
+      if (index < run.tokenIndex) done += size;
+      else if (index === run.tokenIndex && token.type === 'word') done += Math.min(run.charIndex, size);
+    });
+    if (!total) return 0;
+    return Math.min(100, Math.floor((done / total) * 100));
+  }
+
+  function showMilestone(mark) {
+    progress.dataset.mark = String(mark);
+    progress.classList.remove('is-celebrate');
+    void progress.offsetWidth;
+    progress.classList.add('is-celebrate');
+    celebrateTone();
+    window.clearTimeout(milestoneTimer);
+    milestoneTimer = window.setTimeout(function () {
+      progress.classList.remove('is-celebrate');
+    }, 1100);
+  }
+
+  function paintProgress() {
+    var pct = passagePercent();
+    progressValue.textContent = pct + '%';
+    var mark = Math.floor(pct / 10) * 10;
+    if (mark < 10 || mark <= celebratedMark) return false;
+    celebratedMark = mark;
+    showMilestone(mark);
+    return true;
+  }
+
+  function resetProgress() {
+    celebratedMark = 0;
+    window.clearTimeout(milestoneTimer);
+    progress.dataset.mark = '0';
+    progress.classList.remove('is-celebrate');
+    progressValue.textContent = '0%';
+  }
+
   function renderPlay() {
     renderStrip();
     renderStage();
     play.classList.toggle('is-combo', run.combo >= COMBO_AT);
     paintStats();
+    return paintProgress();
   }
 
   function flashError() {
@@ -189,24 +243,68 @@
     }, 520);
   }
 
-  function tone(ok) {
-    if (!soundOn) return;
+  function ensureAudio() {
+    if (!soundOn) return null;
     var Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return;
+    if (!Ctx) return null;
     if (!audioCtx) audioCtx = new Ctx();
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    var now = audioCtx.currentTime;
-    var osc = audioCtx.createOscillator();
-    var gain = audioCtx.createGain();
+    return audioCtx;
+  }
+
+  function tone(ok) {
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    var now = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
     osc.type = ok ? 'triangle' : 'sawtooth';
     osc.frequency.value = ok ? 680 : 150;
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(ok ? 0.04 : 0.03, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + (ok ? 0.07 : 0.12));
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.13);
+  }
+
+  function celebrateTone() {
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    [523.25, 659.25, 783.99, 1046.5].forEach(function (freq, index) {
+      var start = ctx.currentTime + index * 0.09;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.07, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.36);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.38);
+    });
+  }
+
+  function applyKey(ch) {
+    if (play.hidden || !run) return;
+    var result = engine.press(run, ch);
+    if (result.ignored) return;
+    var celebrated = renderPlay();
+    if (result.ok) {
+      if (!celebrated) tone(true);
+    } else {
+      tone(false);
+      flashError();
+    }
+    if (result.finished) {
+      window.clearTimeout(finishTimer);
+      finishTimer = window.setTimeout(function () {
+        if (run && run.status === 'finished') showFinish();
+      }, celebrated ? 980 : 0);
+    }
   }
 
   function showFinish() {
@@ -245,6 +343,7 @@
     emptyNote.hidden = true;
     play.classList.remove('is-error', 'is-combo');
     finish.classList.remove('is-burst');
+    resetProgress();
     show(play);
     renderPlay();
     startStats();
@@ -255,6 +354,7 @@
     run = engine.restart(run || engine.createRun(source));
     play.classList.remove('is-error', 'is-combo');
     finish.classList.remove('is-burst');
+    resetProgress();
     show(play);
     renderPlay();
     startStats();
@@ -269,13 +369,19 @@
   themeSwitch.querySelector('[data-theme-option="dark"]').textContent = copy.dark;
   themeSwitch.querySelector('[data-theme-option="light"]').textContent = copy.light;
   spacebar.textContent = copy.space;
-  passage.placeholder = copy.sample;
+  catcher.placeholder = 'Type here';
+  passage.placeholder = copy.placeholder;
 
   loadTheme();
   show(setup);
 
   document.getElementById('use-sample').addEventListener('click', function () {
-    passage.value = copy.sample;
+    var index = Math.floor(Math.random() * copy.samples.length);
+    if (copy.samples.length > 1 && index === lastSample) {
+      index = (index + 1) % copy.samples.length;
+    }
+    lastSample = index;
+    passage.value = copy.samples[index];
     emptyNote.hidden = true;
     passage.focus();
   });
@@ -320,7 +426,30 @@
 
   play.addEventListener('click', function (event) {
     if (event.target.closest('button')) return;
-    play.focus();
+    catcher.focus();
+  });
+
+  catcher.addEventListener('beforeinput', function (event) {
+    if (play.hidden || !run) return;
+    if (event.inputType && event.inputType.indexOf('delete') === 0) {
+      event.preventDefault();
+      return;
+    }
+    if (!event.data) return;
+    event.preventDefault();
+    sawBeforeInput = true;
+    window.setTimeout(function () { sawBeforeInput = false; }, 0);
+    Array.from(event.data).forEach(applyKey);
+  });
+
+  catcher.addEventListener('input', function () {
+    var value = catcher.value;
+    catcher.value = '';
+    if (sawBeforeInput) {
+      sawBeforeInput = false;
+      return;
+    }
+    Array.from(value).forEach(applyKey);
   });
 
   soundBtn.addEventListener('click', function () {
@@ -339,17 +468,10 @@
 
   window.addEventListener('keydown', function (event) {
     if (play.hidden || !run) return;
+    if (event.target === catcher || event.target === passage) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     if (typeof event.key !== 'string' || event.key.length !== 1) return;
     event.preventDefault();
-    var result = engine.press(run, event.key);
-    if (result.ignored) return;
-    if (result.ok) tone(true);
-    else {
-      tone(false);
-      flashError();
-    }
-    renderPlay();
-    if (result.finished) showFinish();
+    applyKey(event.key);
   }, true);
 })();

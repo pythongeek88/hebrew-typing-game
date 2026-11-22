@@ -2,7 +2,7 @@
 <html lang="en" dir="rtl" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>Hebrew typing</title>
   <link rel="icon" href="favicon.png?v=1" type="image/png">
   <meta name="description" content="Paste a passage and type it letter by letter.">
@@ -45,6 +45,9 @@
 
   <section id="screen-play" class="screen screen-play" hidden tabindex="-1">
     <div class="stage">
+      <div id="progress" class="progress" data-mark="0" aria-live="polite">
+        <span id="progress-value">0%</span>
+      </div>
       <div id="passage-strip" class="passage-strip" dir="rtl"></div>
       <p id="script-tag" class="script-tag" dir="ltr"></p>
       <div id="stage-word" class="stage-word"></div>
@@ -56,6 +59,7 @@
         <span id="stat-accuracy"></span>
       </div>
       <button id="restart-play" class="quiet" type="button">Restart</button>
+      <input id="key-catcher" class="key-catcher" type="text" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here" aria-label="Type the next letter">
     </div>
   </section>
 
