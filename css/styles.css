@@ -616,16 +616,6 @@ button {
     0 12px 32px rgba(255, 176, 32, 0.1);
 }
 
-.spacebar::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border: 2px solid var(--accent);
-  border-radius: inherit;
-  pointer-events: none;
-  animation: space-pulse 1.8s ease-out infinite;
-}
-
 .play-meter {
   display: flex;
   flex-direction: column;
@@ -745,12 +735,6 @@ button {
   animation: error-flash 520ms ease-out;
 }
 
-#screen-play.is-combo .stage-word,
-.screen-play.is-combo .stage-word,
-.stage.is-combo .stage-word {
-  animation: combo-glow 1.7s ease-in-out infinite;
-}
-
 .screen.is-burst {
   overflow: hidden;
 }
@@ -813,17 +797,6 @@ button {
   }
 }
 
-@keyframes space-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1.06, 1.18);
-    opacity: 0;
-  }
-}
-
 @keyframes error-flash {
   0% {
     opacity: 0;
@@ -833,18 +806,6 @@ button {
   }
   100% {
     opacity: 0;
-  }
-}
-
-@keyframes combo-glow {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 10px rgba(255, 176, 32, 0.28));
-  }
-  50% {
-    filter:
-      drop-shadow(0 0 12px rgba(255, 176, 32, 0.72))
-      drop-shadow(0 0 30px rgba(255, 176, 32, 0.32));
   }
 }
 
@@ -968,18 +929,6 @@ button {
   .start-button.is-shake {
     animation: none;
     transform: none;
-  }
-
-  .spacebar::after {
-    animation: none;
-    opacity: 0;
-  }
-
-  #screen-play.is-combo .stage-word,
-  .screen-play.is-combo .stage-word,
-  .stage.is-combo .stage-word {
-    animation: none;
-    filter: none;
   }
 
   .progress.is-celebrate {

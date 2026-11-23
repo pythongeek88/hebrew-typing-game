@@ -78,7 +78,7 @@
   function scriptLabel(ch) {
     var cp = ch.codePointAt(0);
     if (cp >= 0x05D0 && cp <= 0x05EA) return copy.scriptHebrew;
-    if (cp >= 0x0400 && cp <= 0x04FF) return copy.scriptRussian;
+    if ((cp >= 0x0410 && cp <= 0x044F) || cp === 0x0401 || cp === 0x0451) return copy.scriptRussian;
     if ((cp >= 0x41 && cp <= 0x5A) || (cp >= 0x61 && cp <= 0x7A) || (cp >= 0xC0 && cp <= 0x24F)) {
       return copy.scriptEnglish;
     }

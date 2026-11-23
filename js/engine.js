@@ -5,11 +5,16 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // Turn curly quotes and dashes into the matching keyboard punctuation.
+  // Russian letters a keyboard can type, including ё.
+  function isRussianLetter(cp) {
+    return (cp >= 0x0410 && cp <= 0x044F) || cp === 0x0401 || cp === 0x0451;
+  }
+
+  // Turn lookalike quotes, dashes, and Hebrew marks into the key that types them.
   function foldPunctuation(cp) {
-    if (cp === 0x2018 || cp === 0x2019 || cp === 0x201A || cp === 0x201B) return 0x0027;
-    if (cp === 0x201C || cp === 0x201D || cp === 0x201E || cp === 0x201F) return 0x0022;
-    if (cp === 0x2013 || cp === 0x2014 || cp === 0x2212) return 0x002D;
+    if (cp === 0x2018 || cp === 0x2019 || cp === 0x201A || cp === 0x201B || cp === 0x05F3) return 0x0027;
+    if (cp === 0x201C || cp === 0x201D || cp === 0x201E || cp === 0x201F || cp === 0x05F4) return 0x0022;
+    if (cp === 0x2013 || cp === 0x2014 || cp === 0x2212 || cp === 0x05BE) return 0x002D;
     return cp;
   }
 
@@ -20,8 +25,7 @@
     if ((cp >= 0x0041 && cp <= 0x005A) || (cp >= 0x0061 && cp <= 0x007A)) return true;
     if (cp >= 0x0030 && cp <= 0x0039) return true;
     if (cp >= 0x05D0 && cp <= 0x05EA) return true;
-    if (cp >= 0x0400 && cp <= 0x04FF) return true;
-    if (cp === 0x05BE || cp === 0x05F3 || cp === 0x05F4) return true;
+    if (isRussianLetter(cp)) return true;
     return cp === 0x0021 || cp === 0x0022 || cp === 0x0027 ||
       cp === 0x0028 || cp === 0x0029 || cp === 0x002C ||
       cp === 0x002D || cp === 0x002E || cp === 0x002F ||
@@ -44,7 +48,7 @@
   // Strong scripts only. Digits, hyphen, comma, period, maqaf, and quotes are neutral.
   function strongScript(cp) {
     if (isHebrewLetter(cp)) return 'hebrew';
-    if (cp >= 0x0400 && cp <= 0x04FF) return 'cyrillic';
+    if (isRussianLetter(cp)) return 'cyrillic';
     if ((cp >= 0x0041 && cp <= 0x005A) ||
         (cp >= 0x0061 && cp <= 0x007A) ||
         (cp >= 0x00C0 && cp <= 0x024F)) return 'latin';
@@ -212,7 +216,9 @@
   }
 
   function press(run, key) {
-    if (typeof key !== 'string' || key.length !== 1) return ignoredResult();
+    if (typeof key !== 'string' || key.length === 0) return ignoredResult();
+    var typed = String.fromCodePoint(foldPunctuation(key.codePointAt(0)));
+    if (typed.length !== 1) return ignoredResult();
     if (run.status === 'empty' || run.status === 'finished') return ignoredResult();
 
     var expected = currentExpected(run);
@@ -224,7 +230,7 @@
       run.status = 'playing';
     }
 
-    if (key === expected) {
+    if (typed === expected) {
       run.typed += 1;
       run.combo += 1;
       var finished = advance(run, now);
