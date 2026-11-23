@@ -626,6 +626,13 @@ button {
   animation: space-pulse 1.8s ease-out infinite;
 }
 
+.play-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .stats {
   display: flex;
   flex-wrap: wrap;
